@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style/style.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="wrapper">
+        <header class="header">
+            <div class="header__container container">
+                <div class="header__body">
+                    <h1 class="header__title title">Blog</h1>
+                </div>
+            </div>
+        </header>
+
+
+        <main class="main">
+            <section class="blog">
+                <div class="blog__container container"></div>
+            </section>
+        </main>
+
+
+        <footer class="footer">
+            <div class="footer__container container">
+                <div class="footer__body">
+                    <button id="add-button" class="footer__add button-reset button">+</button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <div class="modal">
+        <div class="modal__body">
+            <div class="modal__content">
+                <div class="modal__header">
+                    <h3 class="modal__title">Add post</h3>
+                    <button id="close-button" class="modal__close button-reset button">X</button>
+                </div>
+                <form id="form" class="modal__main form">
+
+                    <div class="form__file">
+                        <label class="form__add">
+                            <p class="form__add-subtitle">+</p>
+                            <input id="add-file" class="form__add-file" type="file" name="file">
+                        </label>
+                        <div class="form__file-preview">
+                            <img class="form__file-preview__image" src="" alt="preview">
+                        </div>
+                    </div>
+
+                
+                    <div class="form__describe">
+                         <input id="add-username" class="form__describe-username input input-reset" type="text" name="username" placeholder="username">
+                    </div>
+    
+                    <div class="form__describe form__describe-textarea">
+                        <textarea id="add-description" class="form__describe-description" type="text" name="description" placeholder="description"></textarea>
+                    </div>
+            
+                    <div class="form__footer">
+                        <button class="form__create button-reset button">create post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="script/script.js"></script>
+</body>
+</html>
