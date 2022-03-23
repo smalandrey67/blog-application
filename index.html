@@ -14,6 +14,10 @@
                 <div class="header__body">
                     <h1 class="header__title title">Blog</h1>
 
+
+                    <div class="header__search">
+                        <input id="search-post" class="header__search-input input-reset input" type="text" name="search" placeholder="search">
+                    </div>
                     <div class="header__avatar">
                         <img class="header__avatar-image" src="images/default-avatar.png" alt="avatar">
                     </div>
@@ -25,7 +29,16 @@
 
         <main class="main">
             <section class="blog">
-                <div class="blog__container container"></div>
+                <div class="blog__container container">
+                    <div class="spinner">
+                        <div class="loadingio-spinner-rolling-is8eylvnl98">
+                            <div class="ldio-be6fe29sbx9">
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </section>
         </main>
 
@@ -44,21 +57,21 @@
             <div class="modal__content">
                 <div class="modal__header">
                     <h3 class="modal__title">Add post</h3>
-                    <button id="close-button" class="modal__close button-reset button">X</button>
+                    <img class="modal__close close-modal" src="images/cross-close.png" alt="cross">
                 </div>
                 <form id="form" class="modal__main form">
 
                     <div class="form__file">
                         <label class="form__add">
                             <p class="form__add-subtitle">+</p>
-                            <input id="add-file" class="form__add-file" type="file" name="file">
+                            <input id="add-file" class="form__add-file" type="file" name="file" accept=".png,.jpg,.jpeg,.gif">
                         </label>
                         <div class="form__file-preview">
                             <img class="form__file-preview__image" src="" alt="preview">
                         </div>
                     </div>
 
-                    <div class="form__describe form__describe-textarea">
+                    <div class="form__describe">
                         <textarea id="add-description" class="form__describe-description" type="text" name="description" placeholder="description"></textarea>
                     </div>
             
@@ -76,7 +89,7 @@
             <div class="popup__content">
                 <div class="popup__header">
                     <h3 class="popup__title">Add your avatar</h3>
-                    <button id="popup-close" class="popup__close button-reset button">X</button>
+                    <img class="popup__close close-modal" src="images/cross-close.png" alt="cross">
                 </div>
                 <form id="form-avatar" class="popup__main form-popup">
 
@@ -85,10 +98,9 @@
                             <img class="form-popup__file-preview__image" src="images/default-avatar.png" alt="preview">
                         </div>
 
-
                         <label class="form-popup__add">
                             <p class="form-popup__add-subtitle">+</p>
-                            <input id="avatar-add" class="form-popup__add-file" type="file" name="file">
+                            <input id="avatar-add" class="form-popup__add-file" type="file" name="file" accept=".png,.jpg,.jpeg,.gif">
                         </label>
                     </div>
 

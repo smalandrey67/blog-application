@@ -19,6 +19,7 @@ input::-ms-reveal,input::-ms-clear {display: none;}
 :root{
     --color-black: #000;
     --color-white: #fff;
+    --color-grey: grey;
     --color-main: #00032a;
     --color-post: #03051d;
 }
@@ -28,7 +29,8 @@ body{
     font-size: 16px;
     color: var(--color-white);
     background-color: var(--color-main);
-    font-family: Arial, Helvetica, sans-serif;
+    /* font-family: Arial, Helvetica, sans-serif; */
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     height: 100vh;
 }
 .body--active{
@@ -57,7 +59,6 @@ body{
 .input{
     width: 100%;
     padding: 0 10px;
-    height: 24px;
     border-radius: 10px;
     color: var(--color-white);
 }
@@ -71,6 +72,11 @@ body{
     border: none;
     outline: none;
 }
+
+.close-modal{
+    width: 18px;
+    height: 18px;
+}
 /* ===== header ===== */
 .header{
     position: fixed;
@@ -78,6 +84,8 @@ body{
     left: 0;
     width: 100%;
     background-color: var(--color-post);
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
 }
 .header__body{
     display: flex;
@@ -88,6 +96,14 @@ body{
 .header__title{
     font-size: 27px;
     font-family: 'Courier New', Courier, monospace;
+}
+.header__search{
+    height: 25px;
+}
+
+.header__search-input{
+    height: 100%;
+    background-color: var(--color-main);
 }
 .header__avatar{
     width: 35px;
@@ -116,7 +132,7 @@ body{
 /* ===== post ===== */
 .post{
     width: 100%;
-    height: 390px;
+    min-height: 390px;
     margin-bottom: 10px;
 }
 .post:last-child{
@@ -163,14 +179,11 @@ body{
     height: 100%;
     object-fit: cover;
 }
-.post__likes{
-    margin-bottom: 5px;
-}
 .post__functionality{
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 .post__add{
     display: flex;
@@ -189,16 +202,26 @@ body{
 .post__description{
     font-size: 13px;
 }
+.post__description--button{
+    color: var(--color-grey);
+}
 
 /* ===== footer ===== */
-
+.blog__spinner{
+    display: none;
+}
+.blog__spinner{
+    display: block;
+}
 .footer{
     position: fixed;
     bottom: 0; 
     left: 0;
     width: 100%;
     background-color: var(--color-post);
-    height: 30px;
+    height: 50px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
 }
 .footer__body{
     display: flex;
@@ -213,7 +236,8 @@ body{
     position: relative;
     background-color: var(--color-black);
     color: var(--color-white);
-    top: -30px;
+    top: -20px;
+    padding-bottom: 5px;
 }
 
 
@@ -267,21 +291,29 @@ body{
 
 .form__file{
     margin-bottom: 10px;
+    position: relative;
 }
 
 .form__add{
-    display: block;
-    width: 120px;
-    height: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: var(--color-main);
+    opacity: 0.4;
     border-radius: 10px;
     margin-bottom: 10px;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.form__add--hide{
+    display: none;
 }
 .form__add-subtitle{
-    font-size: 20px;
+    font-size: 40px;
     font-weight: 500;
 }
 .form__add-file{
@@ -305,11 +337,8 @@ body{
     object-fit: cover;
 }
 .form__describe{
-    height: 30px;
     margin-bottom: 10px;
-}
-.form__describe-textarea{
-    height: 140px;
+    height: 160px;
 }
 .form__describe-username{
     height: 100%;
@@ -454,6 +483,51 @@ body{
     width: 100%;
 }
 
+/* ===== spinner ===== */
+.spinner{
+    height: 60vh;
+    width: 100%;
+    display: none;
+}
+.spinner--active{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+@keyframes ldio-be6fe29sbx9 {
+    0% { transform: translate(-50%,-50%) rotate(0deg); }
+    100% { transform: translate(-50%,-50%) rotate(360deg); }
+  }
+  .ldio-be6fe29sbx9 div {
+    position: absolute;
+    width: 102px;
+    height: 102px;
+    border: 8.16px solid #848383;
+    border-top-color: transparent;
+    border-radius: 50%;
+  }
+  .ldio-be6fe29sbx9 div {
+    animation: ldio-be6fe29sbx9 1s linear infinite;
+    top: 102px;
+    left: 102px
+  }
+  .loadingio-spinner-rolling-is8eylvnl98 {
+    width: 204px;
+    height: 204px;
+    display: inline-block;
+    overflow: hidden;
+    background: none;
+  }
+  .ldio-be6fe29sbx9 {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform: translateZ(0) scale(1);
+    backface-visibility: hidden;
+    transform-origin: 0 0; /* see note above */
+  }
+  .ldio-be6fe29sbx9 div { box-sizing: content-box; }
+  
 
 
 

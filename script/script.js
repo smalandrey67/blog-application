@@ -6,17 +6,16 @@ const formPopup = document.getElementById('form-avatar')
 const postsContainer = document.querySelector('.blog__container')
 const imageAvatar = document.querySelector('.header__avatar-image')
 const nicknameContainer = document.querySelector('.form-popup__nickname')
-
 const previewContainer = document.querySelector('.form__file-preview') 
 const previewImage = document.querySelector('.form__file-preview__image')
-
 const previewAvatarContainer = document.querySelector('.form-popup__file-preview') 
 const previewAvatarImage = document.querySelector('.form-popup__file-preview__image')
+const formFileContainer = document.querySelector('.form__add')
+
 
 //button veribles
 const buttonAdd = document.getElementById('add-button')
 const buttonAvatar = document.querySelector('.header__avatar')
-
 
 //filed veribles
 const inputFile = document.getElementById('add-file')
@@ -32,10 +31,14 @@ let personalUserData = {
     currentUsername: '',
 }
 
+if(!posts.length){
+   document.querySelector('.spinner').classList.add('spinner--active')
+}
+
 //getting data whenever page loads 
 if(localStorage.getItem('posts')){
-    posts = [...JSON.parse(localStorage.getItem('posts'))]
-
+    posts = JSON.parse(localStorage.getItem('posts'))
+    
     renderPosts()
 }
 
@@ -44,7 +47,6 @@ if(localStorage.getItem('avatar')){
 
     imageAvatar.src = personalUserData.currentAvatarUrl
 }
-
 
 //update localStorage
 function updateLocalStorage(){
@@ -55,21 +57,45 @@ function updateAvatarLocalStorage(){
     localStorage.setItem('avatar', JSON.stringify(personalUserData))
 }
 
+//helper functions
+function addClassModal(element, type){
+    document.body.classList.add('body--active')
+    element.classList.add(type)
+}
+
+function removeClassModal(element, type){
+    document.body.classList.remove('body--active')
+    element.classList.remove(type) 
+}
+
+function stringValidate(string){
+    return string.length >= 35 ? `${string.slice(0, 35)}...<button id="show-more" class="post__description-more post__description--button button-reset">more</button>` : string;
+}
+
+function addActiveImageUpload(element, type){ 
+    element.classList.add(type)
+}
+
+function resetActiveImageUpload(element, type){
+    element.classList.remove(type)
+}
 
 //modal functionality
 function openModal(){
     if(!modal) return
 
-    document.body.classList.add('body--active')
-    modal.classList.add('modal--active')
+    addClassModal(modal, 'modal--active')
 }
 
 function closeModal(e){
     if(!modal) return
 
     if(e.target.classList.contains('modal__body') || e.target.classList.contains('modal__close')){
-        modal.classList.remove('modal--active') 
-        document.body.classList.remove('body--active')
+        formFileContainer.classList.remove('form__add--hide') 
+
+        removeClassModal(modal, 'modal--active')
+        resetActiveImageUpload(previewContainer, 'form__file-preview--active')
+        resetFieldsForm()
     }
 }
 
@@ -77,22 +103,25 @@ buttonAdd.addEventListener('click', openModal)
 document.addEventListener('click', closeModal)
 
 //popup functionality
-function openPopup(){
+function openPopup(){ 
     if(!popup) return
 
+    // whenever we open popup whe put inside of each filed data
     nicknameContainer.textContent = personalUserData.currentUsername
     previewAvatarImage.src = personalUserData.currentAvatarUrl
 
-    document.body.classList.add('body--active')
-    popup.classList.add('popup--active')
+    addClassModal(popup, 'popup--active')
 }
 
 function closePopup(e){
     if(!popup) return
-
+    
     if(e.target.classList.contains('popup__body') || e.target.classList.contains('popup__close')){
-        popup.classList.remove('popup--active') 
-        document.body.classList.remove('body--active')
+        formFileContainer.classList.remove('form__add--hide') 
+
+        removeClassModal(popup, 'popup--active')
+        resetActiveImageUpload(previewAvatarContainer, 'form-popup__file-preview--active')
+        resetFieldsPopupForm()
     }
 }
 
@@ -100,25 +129,27 @@ buttonAvatar.addEventListener('click', openPopup)
 document.addEventListener('click', closePopup)
 
 
-
-//getting image
+//getting image url
 function fileHandler(e, type){
     const dataFile = e.target.files[0]
     const reader = new FileReader()
 
     reader.readAsDataURL(dataFile)
 
-    reader.addEventListener('load', (e) => {      
+    reader.addEventListener('load', (e) => {
         if(type === 'POST'){
-            previewContainer.classList.add('form__file-preview--active')
-
+            formFileContainer.classList.add('form__add--hide') 
+        
+            addActiveImageUpload(previewContainer, 'form__file-preview--active')
+    
             currentImageUrl = e.target.result
             previewImage.src = e.target.result
 
             return
         }
-        previewAvatarContainer.classList.add('form-popup__file-preview--active')
-
+        addActiveImageUpload(previewAvatarContainer, 'form-popup__file-preview--active')
+     
+    
         personalUserData.currentAvatarUrl = e.target.result
         previewAvatarImage.src = e.target.result
     })
@@ -128,18 +159,8 @@ inputFile.addEventListener('change', (e) => fileHandler(e, 'POST'))
 inputAvatar.addEventListener('change', fileHandler)
 
 
-//submit post form
-function getUserData(){
-    return {
-       description: inputDescription.value.trim().toLowerCase(),
-       personal: personalUserData,
-       image: currentImageUrl,
-       id: new Date().getMilliseconds(),
-       likes:  0,
-       comments: [],
-    }
-}
 
+//reset fields functions
 function resetFieldsForm(){
     inputDescription.value = ''
     inputFile.value = ''
@@ -150,6 +171,19 @@ function resetFieldsPopupForm(){
     inputUsername.value = ''
 }
 
+//create post object
+function getUserData(){
+    return {
+       description: inputDescription.value.trim(),
+       personal: personalUserData,
+       image: currentImageUrl,
+       id: new Date().getMilliseconds(),
+       likes:  0,
+       comments: [],
+    }
+}
+
+//post submit
 function formHandler(e){
     e.preventDefault()
 
@@ -163,9 +197,11 @@ function formHandler(e){
 
     posts = [userData, ...posts]
 
-    modal.classList.remove('modal--active')
-    document.body.classList.remove('body--active')
+    formFileContainer.classList.remove('form__add--hide') 
 
+    removeClassModal(modal, 'modal--active')
+    resetActiveImageUpload(previewContainer, 'form__file-preview--active')
+    
     updateLocalStorage()
     resetFieldsForm()
     renderPosts()
@@ -173,6 +209,7 @@ function formHandler(e){
 
 form.addEventListener('submit', formHandler)
 
+//popup submit
 function formPopupHandler(e){
     e.preventDefault()
 
@@ -186,17 +223,18 @@ function formPopupHandler(e){
 
     imageAvatar.src = personalUserData.currentAvatarUrl
 
-
     resetFieldsPopupForm()
     updateAvatarLocalStorage()
 }
+
 formPopup.addEventListener('submit', formPopupHandler)
 
 
 
 //likes functionality
-function likesHandler(id){ 
-    const likesCount = document.querySelector('.post__likes-count')
+function likesHandler(id, parent){ 
+    // const likeItem = posts.find(post => post.id === id) 
+    const likesCount = parent.querySelector('.post__likes-count')
     likesCount.textContent = ++likesCount.textContent
 
     const filterPosts = posts.map(post => {
@@ -211,12 +249,33 @@ function likesHandler(id){
     updateLocalStorage()
 }
 
+//show more description
+function descriptionHandler(id, element){
+    const parentOfElement = element.closest('.post__description')
+    const elementOfFllDescription = posts.find(post => post.id === id)
+
+    parentOfElement.innerHTML = `${elementOfFllDescription.description} <button class="post__description-hide post__description--button button-reset">hide</button>`
+}
+
+function hideDescriptionHandler(element){
+    const parentOfElement = element.closest('.post__description')
+
+    parentOfElement.innerHTML = `${stringValidate(parentOfElement.textContent)}`
+}
+
 //follow each click inside of article
 function addFunctionality(e){
     const event = e.target
-    const dataId = +event.closest('.post__functionality').dataset.post
+    const currentParent = event.closest('.post')
+    const dataId = +event.closest('.post').dataset.post
     
-    if(event.classList.contains('post__add-like')) likesHandler(dataId)
+    if(event.classList.contains('post__add-like')){
+        likesHandler(dataId, currentParent)
+    }else if(event.classList.contains('post__description-more')){
+        descriptionHandler(dataId, event)
+    }else if(event.classList.contains('post__description-hide')){
+        hideDescriptionHandler(event)
+    }
 }
 
 //listener for each artcile
@@ -235,13 +294,13 @@ function renderPosts(){
 
     posts.forEach(post => {
         div.innerHTML += `
-        <article class="blog__post post">
+        <article class="blog__post post" data-post=${post.id}>
             <div class="post__body">
                 <div class="post__header">
                     <div class="post__avatar">
                         <img class="post__avatar-image" src=${post.personal.currentAvatarUrl} alt="avatar">
                     </div>
-                    <h3 class="post__nickname">${post.personal.currentUsername}</h3>
+                    <h3 class="post__nickname">${post.personal.currentUsername || 'anonymus'}</h3>
                 </div>
                     
                 <div class="post__main">
@@ -251,16 +310,16 @@ function renderPosts(){
                 </div>
 
                 <div class="post__footer">
-                    <div class="post__functionality" data-post=${post.id}>
-                        <p class="post__likes">likes <span class="post__likes-count"> ${post.likes.toString()}</span></p>
+                    <div class="post__functionality">
+                        <p class="post__likes">&#10084 <span class="post__likes-count"> ${post.likes.toString()}</span></p>
 
                         <div class="post__add">
-                            <button class="post__add-like post__add-button button button-reset">Like</button>
-                            <button class="post__add-comment post__add-button button button-reset">Come</button>
+                            <button class="post__add-like post__add-button button button-reset">&#10084</button>
+                            <button class="post__add-comment post__add-button button button-reset">&#128394</button>
                         </div>
                         
                     </div>
-                    <p class="post__description">${post.description}</p>
+                    <p class="post__description">${stringValidate(post.description)}</p>
                 </div>
             </div>
         </article>
