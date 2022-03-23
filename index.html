@@ -13,6 +13,11 @@
             <div class="header__container container">
                 <div class="header__body">
                     <h1 class="header__title title">Blog</h1>
+
+                    <div class="header__avatar">
+                        <img class="header__avatar-image" src="images/default-avatar.png" alt="avatar">
+                    </div>
+                    
                 </div>
             </div>
         </header>
@@ -53,11 +58,6 @@
                         </div>
                     </div>
 
-                
-                    <div class="form__describe">
-                         <input id="add-username" class="form__describe-username input input-reset" type="text" name="username" placeholder="username">
-                    </div>
-    
                     <div class="form__describe form__describe-textarea">
                         <textarea id="add-description" class="form__describe-description" type="text" name="description" placeholder="description"></textarea>
                     </div>
@@ -65,10 +65,49 @@
                     <div class="form__footer">
                         <button class="form__create button-reset button">create post</button>
                     </div>
+
                 </form>
             </div>
         </div>
     </div>
+
+    <div class="popup">
+        <div class="popup__body">
+            <div class="popup__content">
+                <div class="popup__header">
+                    <h3 class="popup__title">Add your avatar</h3>
+                    <button id="popup-close" class="popup__close button-reset button">X</button>
+                </div>
+                <form id="form-avatar" class="popup__main form-popup">
+
+                    <div class="form-popup__file">
+                        <div class="form-popup__file-preview">
+                            <img class="form-popup__file-preview__image" src="images/default-avatar.png" alt="preview">
+                        </div>
+
+
+                        <label class="form-popup__add">
+                            <p class="form-popup__add-subtitle">+</p>
+                            <input id="avatar-add" class="form-popup__add-file" type="file" name="file">
+                        </label>
+                    </div>
+
+                    <h3 class="form-popup__nickname"></h3>
+
+                    <div class="form-popup__username">
+                        <input id="add-username" class="form-popup__username-input input-reset input" type="text" name="username" placeholder="username">
+                    </div>
+
+                    <div class="form-popup__footer">
+                        <button class="form-popup__update button-reset button">update</button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+
+
     <script src="script/script.js"></script>
 </body>
 </html>

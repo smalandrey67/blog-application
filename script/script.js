@@ -1,20 +1,36 @@
 //main veribles
 const modal = document.querySelector('.modal')
+const popup = document.querySelector('.popup')
 const form = document.getElementById('form')
+const formPopup = document.getElementById('form-avatar')
+const postsContainer = document.querySelector('.blog__container')
+const imageAvatar = document.querySelector('.header__avatar-image')
+const nicknameContainer = document.querySelector('.form-popup__nickname')
+
 const previewContainer = document.querySelector('.form__file-preview') 
 const previewImage = document.querySelector('.form__file-preview__image')
-const postsContainer = document.querySelector('.blog__container')
+
+const previewAvatarContainer = document.querySelector('.form-popup__file-preview') 
+const previewAvatarImage = document.querySelector('.form-popup__file-preview__image')
 
 //button veribles
 const buttonAdd = document.getElementById('add-button')
+const buttonAvatar = document.querySelector('.header__avatar')
+
 
 //filed veribles
 const inputFile = document.getElementById('add-file')
+const inputAvatar = document.getElementById('avatar-add')
 const inputUsername = document.getElementById('add-username')
 const inputDescription = document.getElementById('add-description')
 
 let posts = []
 let currentImageUrl = ''
+
+let personalUserData = {
+    currentAvatarUrl: 'images/default-avatar.png',
+    currentUsername: '',
+}
 
 //getting data whenever page loads 
 if(localStorage.getItem('posts')){
@@ -23,15 +39,28 @@ if(localStorage.getItem('posts')){
     renderPosts()
 }
 
+if(localStorage.getItem('avatar')){
+    personalUserData = JSON.parse(localStorage.getItem('avatar'))
+
+    imageAvatar.src = personalUserData.currentAvatarUrl
+}
+
+
 //update localStorage
 function updateLocalStorage(){
     localStorage.setItem('posts', JSON.stringify(posts))
 }
 
+function updateAvatarLocalStorage(){
+    localStorage.setItem('avatar', JSON.stringify(personalUserData))
+}
+
+
 //modal functionality
 function openModal(){
     if(!modal) return
 
+    document.body.classList.add('body--active')
     modal.classList.add('modal--active')
 }
 
@@ -40,34 +69,70 @@ function closeModal(e){
 
     if(e.target.classList.contains('modal__body') || e.target.classList.contains('modal__close')){
         modal.classList.remove('modal--active') 
+        document.body.classList.remove('body--active')
     }
 }
 
 buttonAdd.addEventListener('click', openModal)
 document.addEventListener('click', closeModal)
 
+//popup functionality
+function openPopup(){
+    if(!popup) return
+
+    nicknameContainer.textContent = personalUserData.currentUsername
+    previewAvatarImage.src = personalUserData.currentAvatarUrl
+
+    document.body.classList.add('body--active')
+    popup.classList.add('popup--active')
+}
+
+function closePopup(e){
+    if(!popup) return
+
+    if(e.target.classList.contains('popup__body') || e.target.classList.contains('popup__close')){
+        popup.classList.remove('popup--active') 
+        document.body.classList.remove('body--active')
+    }
+}
+
+buttonAvatar.addEventListener('click', openPopup)
+document.addEventListener('click', closePopup)
+
+
 
 //getting image
-function fileHandler(){
-    const dataFile = inputFile.files[0]
+function fileHandler(e, type){
+    const dataFile = e.target.files[0]
     const reader = new FileReader()
 
     reader.readAsDataURL(dataFile)
 
-    reader.addEventListener('load', (e) => {
-        previewContainer.classList.add('form__file-preview--active')
-        currentImageUrl = e.target.result
-        previewImage.src = e.target.result
+    reader.addEventListener('load', (e) => {      
+        if(type === 'POST'){
+            previewContainer.classList.add('form__file-preview--active')
+
+            currentImageUrl = e.target.result
+            previewImage.src = e.target.result
+
+            return
+        }
+        previewAvatarContainer.classList.add('form-popup__file-preview--active')
+
+        personalUserData.currentAvatarUrl = e.target.result
+        previewAvatarImage.src = e.target.result
     })
 }
 
-inputFile.addEventListener('change', fileHandler)
+inputFile.addEventListener('change', (e) => fileHandler(e, 'POST'))
+inputAvatar.addEventListener('change', fileHandler)
+
 
 //submit post form
 function getUserData(){
     return {
-       name: inputUsername.value.trim().toLowerCase(),
        description: inputDescription.value.trim().toLowerCase(),
+       personal: personalUserData,
        image: currentImageUrl,
        id: new Date().getMilliseconds(),
        likes:  0,
@@ -76,15 +141,19 @@ function getUserData(){
 }
 
 function resetFieldsForm(){
-    inputUsername.value = ''
     inputDescription.value = ''
     inputFile.value = ''
+}
+
+function resetFieldsPopupForm(){
+    inputAvatar.value = ''
+    inputUsername.value = ''
 }
 
 function formHandler(e){
     e.preventDefault()
 
-    if(inputUsername.value === '' || inputDescription.value === '' || inputFile.value === '') {
+    if(inputDescription.value === '' || inputFile.value === '') {
         console.log('each field is required')
 
         return
@@ -95,6 +164,7 @@ function formHandler(e){
     posts = [userData, ...posts]
 
     modal.classList.remove('modal--active')
+    document.body.classList.remove('body--active')
 
     updateLocalStorage()
     resetFieldsForm()
@@ -103,11 +173,29 @@ function formHandler(e){
 
 form.addEventListener('submit', formHandler)
 
+function formPopupHandler(e){
+    e.preventDefault()
+
+    personalUserData = {
+        ...personalUserData,
+        currentUsername: inputUsername.value.trim()
+    }
+
+    popup.classList.remove('popup--active')
+    document.body.classList.remove('body--active')
+
+    imageAvatar.src = personalUserData.currentAvatarUrl
+
+
+    resetFieldsPopupForm()
+    updateAvatarLocalStorage()
+}
+formPopup.addEventListener('submit', formPopupHandler)
+
 
 
 //likes functionality
-
-function likesHandler(id){
+function likesHandler(id){ 
     const likesCount = document.querySelector('.post__likes-count')
     likesCount.textContent = ++likesCount.textContent
 
@@ -128,7 +216,7 @@ function addFunctionality(e){
     const event = e.target
     const dataId = +event.closest('.post__functionality').dataset.post
     
-    if(event.classList.contains('post__functionality-like')) likesHandler(dataId)
+    if(event.classList.contains('post__add-like')) likesHandler(dataId)
 }
 
 //listener for each artcile
@@ -142,17 +230,18 @@ function addListener(){
 function renderPosts(){
     postsContainer.innerHTML = ''
 
-    const article = document.createElement('article')
-    article.classList.add('blog__post', 'post')
+    const div = document.createElement('div')
+    div.classList.add('blog__wrapper')
 
     posts.forEach(post => {
-        article.innerHTML += `
+        div.innerHTML += `
+        <article class="blog__post post">
             <div class="post__body">
                 <div class="post__header">
                     <div class="post__avatar">
-                        <img class="post__avatar-image" src=${post.image} alt="avatar">
+                        <img class="post__avatar-image" src=${post.personal.currentAvatarUrl} alt="avatar">
                     </div>
-                    <h3 class="post__nickname">${post.name}</h3>
+                    <h3 class="post__nickname">${post.personal.currentUsername}</h3>
                 </div>
                     
                 <div class="post__main">
@@ -162,18 +251,23 @@ function renderPosts(){
                 </div>
 
                 <div class="post__footer">
-                    <p class="post__likes">likes<span class="post__likes-count"> ${post.likes.toString()}</span></p>
                     <div class="post__functionality" data-post=${post.id}>
-                        <button class="post__functionality-like post__functionality-button button button-reset">Like</button>
-                        <button class="post__functionality-comment post__functionality-button button button-reset">Comment</button>
+                        <p class="post__likes">likes <span class="post__likes-count"> ${post.likes.toString()}</span></p>
+
+                        <div class="post__add">
+                            <button class="post__add-like post__add-button button button-reset">Like</button>
+                            <button class="post__add-comment post__add-button button button-reset">Come</button>
+                        </div>
+                        
                     </div>
                     <p class="post__description">${post.description}</p>
                 </div>
             </div>
+        </article>
         `
     })
 
-    postsContainer.append(article)
+    postsContainer.append(div)
     addListener()
 }
 
