@@ -1,6 +1,7 @@
 //main veribles
 const modal = document.querySelector('.modal')
 const popup = document.querySelector('.popup')
+const commetsModal = document.querySelector('.comments')
 const form = document.getElementById('form')
 const formPopup = document.getElementById('form-avatar')
 const postsContainer = document.querySelector('.blog__container')
@@ -24,6 +25,7 @@ const inputUsername = document.getElementById('add-username')
 const inputDescription = document.getElementById('add-description')
 
 let posts = []
+let cuttedComments = []
 let currentImageUrl = ''
 
 let personalUserData = {
@@ -128,6 +130,17 @@ function closePopup(e){
 buttonAvatar.addEventListener('click', openPopup)
 document.addEventListener('click', closePopup)
 
+//comments modal functinality
+
+function closeComments(e){
+    if(!commetsModal) return 
+
+    if(e.target.classList.contains('comments__body') || e.target.classList.contains('comments__close')){
+        commetsModal.classList.remove('comments--active')
+    }
+}
+
+document.addEventListener('click', closeComments)
 
 //getting image url
 function fileHandler(e, type){
@@ -249,6 +262,83 @@ function likesHandler(id, parent){
     updateLocalStorage()
 }
 
+//comment functionality
+
+function showCommetsHandler(id){
+    const commentsList = document.querySelector('.comments__list')
+    const elementOfComments = posts.find(post => post.id === id)
+
+    commentsList.innerHTML = ''
+
+    elementOfComments.comments.forEach(comment => {
+        commentsList.innerHTML += `
+            <li class="post__feedback-item">
+                <h4 class="post__feedback-item__name">${comment.name}:</h4> 
+                ${comment.comment}
+            </li>
+        `
+    }) 
+
+    commetsModal.classList.add('comments--active')
+}
+
+function renderComments(id, parent){
+    const commentsCount = parent.querySelector('.post__all')
+    const listContainer = parent.querySelector('.post__feedback')
+
+    const elementWithComments = posts.find(post => post.id === id)
+
+    commentsCount.textContent = `view all ${elementWithComments.comments.length}`
+   
+    listContainer.innerHTML = ''
+
+    elementWithComments.comments.slice(0, 2).forEach(comment => {
+        listContainer.innerHTML += `
+            <li class="post__feedback-item">
+                <h4 class="post__feedback-item__name">${comment.name}:</h4> 
+                ${comment.comment}
+            </li>
+        `
+    })
+}
+
+
+function addCommentHandler(id, parent){
+    const postContainer = parent.querySelector('.post__comment')
+    const fieldAddComment = parent.querySelector('.post__comment-field')
+
+        const elementOfComments = posts.map(post => {
+            if(post.id === id){
+                return {
+                    ...post, 
+                    comments: [
+                        {
+                            name: personalUserData.currentUsername,
+                            comment: fieldAddComment.value.trim(),
+                        },
+                        ...post.comments
+                    ]
+                }
+            }
+
+            return post
+        })
+
+        posts = elementOfComments
+
+        fieldAddComment.value = ''
+        postContainer.classList.remove('post__comment--active')
+
+        renderComments(id, parent)
+        updateLocalStorage()
+}
+
+function commentHandler(parent){
+    const postContainer = parent.querySelector('.post__comment')
+
+    postContainer.classList.toggle('post__comment--active')
+}
+
 //show more description
 function descriptionHandler(id, element){
     const parentOfElement = element.closest('.post__description')
@@ -266,15 +356,21 @@ function hideDescriptionHandler(element){
 //follow each click inside of article
 function addFunctionality(e){
     const event = e.target
-    const currentParent = event.closest('.post')
+    const parentOfElement = event.closest('.post')
     const dataId = +event.closest('.post').dataset.post
     
     if(event.classList.contains('post__add-like')){
-        likesHandler(dataId, currentParent)
+        likesHandler(dataId, parentOfElement)
+    }else if(event.classList.contains('post__add-comment')){
+        commentHandler(parentOfElement)
+    }else if(event.classList.contains('post__comment-button')){
+        addCommentHandler(dataId, parentOfElement)
     }else if(event.classList.contains('post__description-more')){
         descriptionHandler(dataId, event)
     }else if(event.classList.contains('post__description-hide')){
         hideDescriptionHandler(event)
+    }else if(event.classList.contains('post__all')){
+        showCommetsHandler(dataId)
     }
 }
 
@@ -320,6 +416,24 @@ function renderPosts(){
                         
                     </div>
                     <p class="post__description">${stringValidate(post.description)}</p>
+                    <div class="post__comment">
+                        <input class="post__comment-field input-reset input" name="comment" type="text" placeholder="add your comment">
+                        <button
+                         class="post__comment-button button-reset button">go</button>
+                    </div>
+            
+                    <ul class="post__feedback">
+                        ${post.comments.length !== 0 ? post.comments.slice(0, 2).map(comment => {
+                            return `
+                                <li class="post__feedback-item">
+                                    <h4 class="post__feedback-item__name">${comment.name}:</h4>
+                                     ${comment.comment}
+                                </li>
+                            `
+                        }).join('') : ''}
+                    </ul>
+
+                    <button class="post__all button-reset">view all ${post.comments.length} comments<button> 
                 </div>
             </div>
         </article>

@@ -183,8 +183,47 @@ body{
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
+.post__comment{
+    height: 25px;
+    margin-bottom: 5px;
+    display: none;
+}
+.post__comment--active{
+    display: flex;
+    align-items: center;
+}
+.post__comment-field{
+    flex: 0 1 70%;
+    height: 100%;
+    margin-right: 5px;
+    background-color: var(--color-main);
+}
+.post__comment-button{
+    height: 100%;
+    flex: 0 1 30%;
+    background-color: var(--color-main);
+    color: var(--color-white);
+}
+.post__feedback-item{
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    color: var(--color-grey);
+}
+.post__feedback-item:not(:last-child){
+    margin-bottom: 5px;
+}
+.post__feedback-item__name{
+    color: var(--color-white);
+    font-weight: 600;
+    margin-right: 5px;
+}
+.post__all{
+    color: var(--color-grey);
+}
+
 .post__add{
     display: flex;
     align-items: center;
@@ -201,6 +240,7 @@ body{
 
 .post__description{
     font-size: 13px;
+    margin-bottom: 5px;
 }
 .post__description--button{
     color: var(--color-grey);
@@ -414,8 +454,7 @@ body{
     color: var(--color-white);
     font-size: 18px;
 }
-
-/* ===== form modal ===== */
+/* ===== form popup ===== */
 .form-popup__file{
     margin-bottom: 10px;
     position: relative;
@@ -482,6 +521,46 @@ body{
 .form-popup__update{
     width: 100%;
 }
+/* ===== comments modal ===== */
+.comments{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 200;
+    background-color: rgba(0, 0, 0, 0.534);
+    opacity: 0; 
+    visibility: hidden;
+    transition: all 0.5s ease;
+}
+.comments--active{
+    opacity: 1;
+    visibility: visible;
+}
+.comments__body{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.comments__content{
+    width: 350px;
+    min-height: 360px;
+    background-color: var(--color-post);
+    color: var(--color-white);
+    padding: 15px;
+    border-radius: 10px;
+}
+.comments__header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
 
 /* ===== spinner ===== */
 .spinner{
