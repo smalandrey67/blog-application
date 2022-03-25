@@ -12,11 +12,10 @@
         <header class="header">
             <div class="header__container container">
                 <div class="header__body">
-                    <h1 class="header__title title">Blog</h1>
-
+                    <h1 class="header__title title">Блог</h1>
 
                     <div class="header__search">
-                        <input id="search-post" class="header__search-input input-reset input" type="text" name="search" placeholder="search">
+                        <input id="search-post" class="header__search-input input-reset input" type="text" name="search" placeholder="шукати за іменем">
                     </div>
                     <div class="header__avatar">
                         <img class="header__avatar-image" src="images/default-avatar.png" alt="avatar">
@@ -28,7 +27,41 @@
 
 
         <main class="main">
+
+            <section class="cards">
+                <div class="cards__container">
+                    <button id="button-prev" class="cards__arrow button-reset">
+                        <img class="cards__arrow-image cards__arrow-image__prev" src="images/card-arrow.png" alt="arrow-prev">
+                    </button>
+                    <div class="cards__wrapper">
+                        <div class="cards__list">
+
+                            <!-- <div class="cards__item card">
+                                <h3 class="card__title">Все буде добре</h3>
+                            </div>
+                            <div class="cards__item card">
+                                <h3 class="card__title">be happy</h3>
+                            </div>
+                            <div class="cards__item card">
+                                <h3 class="card__title">we will win</h3>
+                            </div>
+                            <div class="cards__item card">
+                                <h3 class="card__title">the war finished</h3>
+                            </div> -->
+                            
+                        </div>
+                    </div>
+                    <button id="button-next" class="cards__arrow cards__arrow-next button-reset">
+                        <img class="cards__arrow-image cards__arrow-image__next" src="images/card-arrow.png" alt="arrow-next">
+                    </button>
+                </div>
+            </section>
+
+
+
+
             <section class="blog">
+                <h3 class="blog__warning warning"></h3>
                 <div class="blog__container container">
                     <div class="spinner">
                         <div class="loadingio-spinner-rolling-is8eylvnl98">
@@ -37,11 +70,9 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </section>
         </main>
-
 
         <footer class="footer">
             <div class="footer__container container">
@@ -56,7 +87,7 @@
         <div class="modal__body">
             <div class="modal__content">
                 <div class="modal__header">
-                    <h3 class="modal__title">Add post</h3>
+                    <h3 class="modal__title">Додати пост</h3>
                     <img class="modal__close close-modal" src="images/cross-close.png" alt="cross">
                 </div>
                 <form id="form" class="modal__main form">
@@ -72,11 +103,11 @@
                     </div>
 
                     <div class="form__describe">
-                        <textarea id="add-description" class="form__describe-description" type="text" name="description" placeholder="description"></textarea>
+                        <textarea id="add-description" class="form__describe-description" type="text" name="description" placeholder="напиши щось приємне"></textarea>
                     </div>
             
                     <div class="form__footer">
-                        <button class="form__create button-reset button">create post</button>
+                        <button class="form__create button-reset button">загрузити</button>
                     </div>
 
                 </form>
@@ -88,7 +119,7 @@
         <div class="popup__body">
             <div class="popup__content">
                 <div class="popup__header">
-                    <h3 class="popup__title">Add your avatar</h3>
+                    <h3 class="popup__title">Додати аватарку</h3>
                     <img class="popup__close close-modal" src="images/cross-close.png" alt="cross">
                 </div>
                 <form id="form-avatar" class="popup__main form-popup">
@@ -107,11 +138,11 @@
                     <h3 class="form-popup__nickname"></h3>
 
                     <div class="form-popup__username">
-                        <input id="add-username" class="form-popup__username-input input-reset input" type="text" name="username" placeholder="username">
+                        <input id="add-username" class="form-popup__username-input input-reset input" type="text" name="username" placeholder="їм'я">
                     </div>
 
                     <div class="form-popup__footer">
-                        <button class="form-popup__update button-reset button">update</button>
+                        <button class="form-popup__update button-reset button">оновити</button>
                     </div>
                     
                 </form>
@@ -127,13 +158,10 @@
                     <h3 class="comments__title">All comments</h3>
                     <img class="comments__close close-modal" src="images/cross-close.png" alt="cross">
                 </div>
-                <ul class="comments__list">
-
-                </ul>
+                <ul class="comments__list"></ul>
             </div>
         </div>
     </div>
-
 
     <script src="script/script.js"></script>
 </body>

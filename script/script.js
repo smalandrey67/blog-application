@@ -1,3 +1,5 @@
+'use strict'
+
 //main veribles
 const modal = document.querySelector('.modal')
 const popup = document.querySelector('.popup')
@@ -12,17 +14,21 @@ const previewImage = document.querySelector('.form__file-preview__image')
 const previewAvatarContainer = document.querySelector('.form-popup__file-preview') 
 const previewAvatarImage = document.querySelector('.form-popup__file-preview__image')
 const formFileContainer = document.querySelector('.form__add')
-
+const warningContainer = document.querySelector('.blog__warning')
+const cardsList = document.querySelector('.cards__list')
 
 //button veribles
 const buttonAdd = document.getElementById('add-button')
 const buttonAvatar = document.querySelector('.header__avatar')
+const buttonNext = document.getElementById('button-next')
+const buttonPrev = document.getElementById('button-prev')
 
 //filed veribles
 const inputFile = document.getElementById('add-file')
 const inputAvatar = document.getElementById('avatar-add')
 const inputUsername = document.getElementById('add-username')
 const inputDescription = document.getElementById('add-description')
+const inputSearch = document.getElementById('search-post')
 
 let posts = []
 let cuttedComments = []
@@ -30,8 +36,24 @@ let currentImageUrl = ''
 
 let personalUserData = {
     currentAvatarUrl: 'images/default-avatar.png',
-    currentUsername: '',
+    currentUsername: 'anonymous',
 }
+
+let offset = 0
+const phrases = [
+    'Посміхнись', 
+    'Все буде добре', 
+    'Україна переможе', 
+    'Тебе люблять', 
+    'Не переживай', 
+    'Залишилось ще трішки',
+    'Я в тебе вірю',
+    'Скоро будемо іхати до дому',
+    'Заходь на теплий чай',
+    'Ми вже вариво борщ',
+    'Ми на вас чекаємо',
+    'Любимо вас всіх'
+]
 
 if(!posts.length){
    document.querySelector('.spinner').classList.add('spinner--active')
@@ -41,7 +63,9 @@ if(!posts.length){
 if(localStorage.getItem('posts')){
     posts = JSON.parse(localStorage.getItem('posts'))
     
-    renderPosts()
+    document.querySelector('.spinner').classList.remove('spinner--active')
+
+    renderPosts(posts)
 }
 
 if(localStorage.getItem('avatar')){
@@ -70,8 +94,11 @@ function removeClassModal(element, type){
     element.classList.remove(type) 
 }
 
-function stringValidate(string){
-    return string.length >= 35 ? `${string.slice(0, 35)}...<button id="show-more" class="post__description-more post__description--button button-reset">more</button>` : string;
+function stringValidate(string, count){
+    return string.length >= count ? `${string.slice(0, count)}...<button id="show-more" class="post__description-more post__description--button button-reset">more</button>` : string;
+}
+function commentValidate(string, count){
+    return string.length >= count ? `${string.slice(0, count)}...` : string;
 }
 
 function addActiveImageUpload(element, type){ 
@@ -81,6 +108,56 @@ function addActiveImageUpload(element, type){
 function resetActiveImageUpload(element, type){
     element.classList.remove(type)
 }
+
+function randomPhrase(){
+    let random = Math.floor(0 + Math.random() * (phrases.length - 1 + 1 - 0))
+    
+    return phrases[random]
+}
+
+
+//cards functionality
+function createPhrases(){
+   
+    let out = ''
+
+    for(let i = 0; i < 4; i++){
+        out += `
+            <div class="cards__item card">
+                <h3 class="card__title">${randomPhrase()}</h3>
+            </div>
+        `
+    }
+
+    cardsList.innerHTML = out 
+}   
+
+createPhrases()
+
+
+function skipNextCard(){
+    offset += 160
+
+    if(offset > 320){
+        offset = 0
+    }
+
+    cardsList.style.left = `${-offset}px`
+}
+
+function skipPrevCard(){
+    offset -= 160
+
+    if(offset < 0){
+        offset = 320
+    }
+
+    cardsList.style.left = `${-offset}px`
+}
+
+buttonPrev.addEventListener('click', skipPrevCard)
+buttonNext.addEventListener('click', skipNextCard)
+
 
 //modal functionality
 function openModal(){
@@ -131,11 +208,12 @@ buttonAvatar.addEventListener('click', openPopup)
 document.addEventListener('click', closePopup)
 
 //comments modal functinality
-
 function closeComments(e){
     if(!commetsModal) return 
 
     if(e.target.classList.contains('comments__body') || e.target.classList.contains('comments__close')){
+        
+        removeClassModal(commetsModal, 'comments--active')
         commetsModal.classList.remove('comments--active')
     }
 }
@@ -172,7 +250,6 @@ inputFile.addEventListener('change', (e) => fileHandler(e, 'POST'))
 inputAvatar.addEventListener('change', fileHandler)
 
 
-
 //reset fields functions
 function resetFieldsForm(){
     inputDescription.value = ''
@@ -201,7 +278,7 @@ function formHandler(e){
     e.preventDefault()
 
     if(inputDescription.value === '' || inputFile.value === '') {
-        console.log('each field is required')
+        alert('Всі поля повинні бути заповнені')
 
         return
     }
@@ -217,7 +294,7 @@ function formHandler(e){
     
     updateLocalStorage()
     resetFieldsForm()
-    renderPosts()
+    renderPosts(posts)
 }
 
 form.addEventListener('submit', formHandler)
@@ -228,7 +305,7 @@ function formPopupHandler(e){
 
     personalUserData = {
         ...personalUserData,
-        currentUsername: inputUsername.value.trim()
+        currentUsername: inputUsername.value.length ? inputUsername.value.trim().toLowerCase() : personalUserData.currentUsername,
     }
 
     popup.classList.remove('popup--active')
@@ -242,12 +319,22 @@ function formPopupHandler(e){
 
 formPopup.addEventListener('submit', formPopupHandler)
 
+//search post functionality
+function searchPostHandler(e){
+    const visiblePosts = posts.filter(post => post.personal.currentUsername.includes(e.target.value.trim().toLowerCase()))
+
+    renderPosts(visiblePosts)
+}
+
+
+inputSearch.addEventListener('input', searchPostHandler)
 
 
 //likes functionality
 function likesHandler(id, parent){ 
-    // const likeItem = posts.find(post => post.id === id) 
     const likesCount = parent.querySelector('.post__likes-count')
+
+    parent.querySelector('.post__likes').style.color = 'red'
     likesCount.textContent = ++likesCount.textContent
 
     const filterPosts = posts.map(post => {
@@ -263,12 +350,17 @@ function likesHandler(id, parent){
 }
 
 //comment functionality
-
 function showCommetsHandler(id){
     const commentsList = document.querySelector('.comments__list')
     const elementOfComments = posts.find(post => post.id === id)
 
     commentsList.innerHTML = ''
+
+    if(!elementOfComments.comments.length){
+        alert('Поки у цієї фотографії немає коментарів')
+
+        return
+    }
 
     elementOfComments.comments.forEach(comment => {
         commentsList.innerHTML += `
@@ -278,8 +370,7 @@ function showCommetsHandler(id){
             </li>
         `
     }) 
-
-    commetsModal.classList.add('comments--active')
+    addClassModal(commetsModal, 'comments--active')
 }
 
 function renderComments(id, parent){
@@ -288,7 +379,7 @@ function renderComments(id, parent){
 
     const elementWithComments = posts.find(post => post.id === id)
 
-    commentsCount.textContent = `view all ${elementWithComments.comments.length}`
+    commentsCount.textContent = `view all ${elementWithComments.comments.length} comments`
    
     listContainer.innerHTML = ''
 
@@ -296,7 +387,7 @@ function renderComments(id, parent){
         listContainer.innerHTML += `
             <li class="post__feedback-item">
                 <h4 class="post__feedback-item__name">${comment.name}:</h4> 
-                ${comment.comment}
+                ${commentValidate(comment.comment, 28)}
             </li>
         `
     })
@@ -306,6 +397,12 @@ function renderComments(id, parent){
 function addCommentHandler(id, parent){
     const postContainer = parent.querySelector('.post__comment')
     const fieldAddComment = parent.querySelector('.post__comment-field')
+
+    if(!fieldAddComment.value.length) {
+        alert('Ти не можеш відправити пустий коментарій')
+
+        return
+    }
 
         const elementOfComments = posts.map(post => {
             if(post.id === id){
@@ -350,7 +447,7 @@ function descriptionHandler(id, element){
 function hideDescriptionHandler(element){
     const parentOfElement = element.closest('.post__description')
 
-    parentOfElement.innerHTML = `${stringValidate(parentOfElement.textContent)}`
+    parentOfElement.innerHTML = `${stringValidate(parentOfElement.textContent), 35}`
 }
 
 //follow each click inside of article
@@ -382,13 +479,21 @@ function addListener(){
 }
 
 //render posts
-function renderPosts(){
+function renderPosts(array){
     postsContainer.innerHTML = ''
 
+    if(!array.length){    
+        warningContainer.classList.add('blog__warning--active')
+        warningContainer.textContent = 'нічого не було знайдено'
+
+        return
+    }
+
+    warningContainer.classList.remove('blog__warning--active')
     const div = document.createElement('div')
     div.classList.add('blog__wrapper')
 
-    posts.forEach(post => {
+    array.forEach(post => {
         div.innerHTML += `
         <article class="blog__post post" data-post=${post.id}>
             <div class="post__body">
@@ -415,11 +520,10 @@ function renderPosts(){
                         </div>
                         
                     </div>
-                    <p class="post__description">${stringValidate(post.description)}</p>
+                    <p class="post__description">${stringValidate(post.description, 35)}</p>
                     <div class="post__comment">
-                        <input class="post__comment-field input-reset input" name="comment" type="text" placeholder="add your comment">
-                        <button
-                         class="post__comment-button button-reset button">go</button>
+                        <input class="post__comment-field input-reset input" name="comment" type="text" placeholder="напиши свій комент">
+                        <button class="post__comment-button button-reset button">+</button>
                     </div>
             
                     <ul class="post__feedback">
@@ -427,13 +531,13 @@ function renderPosts(){
                             return `
                                 <li class="post__feedback-item">
                                     <h4 class="post__feedback-item__name">${comment.name}:</h4>
-                                     ${comment.comment}
+                                     ${commentValidate(comment.comment, 28)}
                                 </li>
                             `
                         }).join('') : ''}
                     </ul>
 
-                    <button class="post__all button-reset">view all ${post.comments.length} comments<button> 
+                    ${post.comments && `<button class="post__all button-reset">всі ${post.comments.length} коменентарі<button>`}
                 </div>
             </div>
         </article>
