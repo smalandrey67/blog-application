@@ -1,5 +1,3 @@
-'use strict'
-
 //main veribles
 const modal = document.querySelector('.modal')
 const popup = document.querySelector('.popup')
@@ -16,6 +14,7 @@ const previewAvatarImage = document.querySelector('.form-popup__file-preview__im
 const formFileContainer = document.querySelector('.form__add')
 const warningContainer = document.querySelector('.blog__warning')
 const cardsList = document.querySelector('.cards__list')
+const spinner = document.querySelector('.spinner')
 
 //button veribles
 const buttonAdd = document.getElementById('add-button')
@@ -36,35 +35,53 @@ let currentImageUrl = ''
 
 let personalUserData = {
     currentAvatarUrl: 'images/default-avatar.png',
-    currentUsername: 'anonymous',
+    currentUsername: 'анонімус',
 }
+
 
 let offset = 0
 const phrases = [
-    'Посміхнись', 
-    'Все буде добре', 
-    'Україна переможе', 
-    'Тебе люблять', 
-    'Не переживай', 
-    'Залишилось ще трішки',
+    'Так, так, я люблю тебе',
     'Я в тебе вірю',
-    'Скоро будемо іхати до дому',
-    'Заходь на теплий чай',
-    'Ми вже вариво борщ',
-    'Ми на вас чекаємо',
-    'Любимо вас всіх'
+    'Життя - це те, що з тобою відбувається', 
+    'Мы чекаємо на тебе', 
+    'Неосмислене життя не варте того, щоб його прожити', 
+    'Залишилось ще трішки',
+    'Перемога - це ще не все, все це постійне бажання перемагати',
+    'У твоєму словнику немає слова неможливо',
+    'Найкраща помста - величезний успіх',
+    'У всьому є своя краса, але не кожен може її побачити',
+    'Твоє щастя залежить тільки від тебе',
+    'Якщо немає вітру, беріться за весла',
+    'Путін скоро здохне',
+    'Ми стаємо тим, про що ми думаємо',
+    'Будь собою, інші ролі зайняті',
+    'Пакуй валізи скоро до дому',
+    'Заходь на каву',
+    'Прагніть не до успіху, а до цінностей',
+    'В тебе все вийде',
+    'Перемога за нами'
 ]
 
+const POST_ADD_LIKE = 'post__add-like'
+const POST_ADD_COMMENT = 'post__add-comment'
+const POST_COMMENT_BUTTON = 'post__comment-button'
+const POST_DESCRIPTION_MORE = 'post__description-more'
+const POST_DESCRIPTION_HIDE = 'post__description-hide'
+const POST_ALL = 'post__all'
+const POST_DELETE_IMAGE = 'post__delete-image'
+
+
 if(!posts.length){
-   document.querySelector('.spinner').classList.add('spinner--active')
+    addClass(spinner, 'spinner--active')
 }
 
 //getting data whenever page loads 
 if(localStorage.getItem('posts')){
     posts = JSON.parse(localStorage.getItem('posts'))
-    
-    document.querySelector('.spinner').classList.remove('spinner--active')
 
+    removeClass(spinner, 'spinner--active')
+    
     renderPosts(posts)
 }
 
@@ -97,34 +114,42 @@ function removeClassModal(element, type){
 function stringValidate(string, count){
     return string.length >= count ? `${string.slice(0, count)}...<button id="show-more" class="post__description-more post__description--button button-reset">more</button>` : string;
 }
+
 function commentValidate(string, count){
     return string.length >= count ? `${string.slice(0, count)}...` : string;
 }
 
-function addActiveImageUpload(element, type){ 
+function addClass(element, type){ 
     element.classList.add(type)
 }
 
-function resetActiveImageUpload(element, type){
+function removeClass(element, type){
     element.classList.remove(type)
 }
 
-function randomPhrase(){
-    let random = Math.floor(0 + Math.random() * (phrases.length - 1 + 1 - 0))
-    
-    return phrases[random]
+function findElement(array, id){
+    return array.find(item => item.id === id)
 }
 
 
 //cards functionality
+function randomPhrase(){
+    const uniqueSet = new Set()
+    for(let i = 0; i < phrases.length; i++){
+        uniqueSet.add(Math.floor(0 + Math.random() * (phrases.length - 1 + 1 - 0)))
+    }
+
+    return Array.from(uniqueSet).slice(0, 4)
+}
+
 function createPhrases(){
-   
+    const uniqueIndexOfPhrase = randomPhrase()
     let out = ''
 
-    for(let i = 0; i < 4; i++){
+    for(let i = 0; i < uniqueIndexOfPhrase.length; i++){
         out += `
             <div class="cards__item card">
-                <h3 class="card__title">${randomPhrase()}</h3>
+                <h3 class="card__title">&#9728 ${phrases[uniqueIndexOfPhrase[i]]}</h3>
             </div>
         `
     }
@@ -134,13 +159,10 @@ function createPhrases(){
 
 createPhrases()
 
-
 function skipNextCard(){
     offset += 160
 
-    if(offset > 320){
-        offset = 0
-    }
+    if(offset > 320) offset = 0
 
     cardsList.style.left = `${-offset}px`
 }
@@ -148,9 +170,7 @@ function skipNextCard(){
 function skipPrevCard(){
     offset -= 160
 
-    if(offset < 0){
-        offset = 320
-    }
+    if(offset < 0) offset = 320
 
     cardsList.style.left = `${-offset}px`
 }
@@ -170,10 +190,10 @@ function closeModal(e){
     if(!modal) return
 
     if(e.target.classList.contains('modal__body') || e.target.classList.contains('modal__close')){
-        formFileContainer.classList.remove('form__add--hide') 
 
         removeClassModal(modal, 'modal--active')
-        resetActiveImageUpload(previewContainer, 'form__file-preview--active')
+        removeClass(formFileContainer, 'form__add--hide')
+        removeClass(previewContainer, 'form__file-preview--active')
         resetFieldsForm()
     }
 }
@@ -196,10 +216,10 @@ function closePopup(e){
     if(!popup) return
     
     if(e.target.classList.contains('popup__body') || e.target.classList.contains('popup__close')){
-        formFileContainer.classList.remove('form__add--hide') 
 
+        removeClass(formFileContainer, 'form__add--hide')
         removeClassModal(popup, 'popup--active')
-        resetActiveImageUpload(previewAvatarContainer, 'form-popup__file-preview--active')
+        removeClass(previewAvatarContainer, 'form-popup__file-preview--active')
         resetFieldsPopupForm()
     }
 }
@@ -214,7 +234,7 @@ function closeComments(e){
     if(e.target.classList.contains('comments__body') || e.target.classList.contains('comments__close')){
         
         removeClassModal(commetsModal, 'comments--active')
-        commetsModal.classList.remove('comments--active')
+        removeClass(commetsModal, 'comments--active')
     }
 }
 
@@ -229,16 +249,16 @@ function fileHandler(e, type){
 
     reader.addEventListener('load', (e) => {
         if(type === 'POST'){
-            formFileContainer.classList.add('form__add--hide') 
-        
-            addActiveImageUpload(previewContainer, 'form__file-preview--active')
+            addClass(formFileContainer, 'form__add--hide')
+           
+            addClass(previewContainer, 'form__file-preview--active')
     
             currentImageUrl = e.target.result
             previewImage.src = e.target.result
 
             return
         }
-        addActiveImageUpload(previewAvatarContainer, 'form-popup__file-preview--active')
+        addClass(previewAvatarContainer, 'form-popup__file-preview--active')
      
     
         personalUserData.currentAvatarUrl = e.target.result
@@ -287,10 +307,9 @@ function formHandler(e){
 
     posts = [userData, ...posts]
 
-    formFileContainer.classList.remove('form__add--hide') 
-
     removeClassModal(modal, 'modal--active')
-    resetActiveImageUpload(previewContainer, 'form__file-preview--active')
+    removeClass(formFileContainer, 'form__add--hide')
+    removeClass(previewContainer, 'form__file-preview--active')
     
     updateLocalStorage()
     resetFieldsForm()
@@ -308,11 +327,9 @@ function formPopupHandler(e){
         currentUsername: inputUsername.value.length ? inputUsername.value.trim().toLowerCase() : personalUserData.currentUsername,
     }
 
-    popup.classList.remove('popup--active')
-    document.body.classList.remove('body--active')
-
     imageAvatar.src = personalUserData.currentAvatarUrl
 
+    removeClassModal(popup, 'popup--active')
     resetFieldsPopupForm()
     updateAvatarLocalStorage()
 }
@@ -321,11 +338,12 @@ formPopup.addEventListener('submit', formPopupHandler)
 
 //search post functionality
 function searchPostHandler(e){
+    if(!posts.length) return
+
     const visiblePosts = posts.filter(post => post.personal.currentUsername.includes(e.target.value.trim().toLowerCase()))
 
     renderPosts(visiblePosts)
 }
-
 
 inputSearch.addEventListener('input', searchPostHandler)
 
@@ -352,7 +370,7 @@ function likesHandler(id, parent){
 //comment functionality
 function showCommetsHandler(id){
     const commentsList = document.querySelector('.comments__list')
-    const elementOfComments = posts.find(post => post.id === id)
+    const elementOfComments = findElement(posts, id)
 
     commentsList.innerHTML = ''
 
@@ -377,9 +395,9 @@ function renderComments(id, parent){
     const commentsCount = parent.querySelector('.post__all')
     const listContainer = parent.querySelector('.post__feedback')
 
-    const elementWithComments = posts.find(post => post.id === id)
+    const elementWithComments = findElement(posts, id)
 
-    commentsCount.textContent = `view all ${elementWithComments.comments.length} comments`
+    commentsCount.textContent =  `всі ${elementWithComments.comments.length} коментарі`
    
     listContainer.innerHTML = ''
 
@@ -424,8 +442,8 @@ function addCommentHandler(id, parent){
         posts = elementOfComments
 
         fieldAddComment.value = ''
-        postContainer.classList.remove('post__comment--active')
-
+         
+        removeClass(postContainer, 'post__comment--active')
         renderComments(id, parent)
         updateLocalStorage()
 }
@@ -436,10 +454,20 @@ function commentHandler(parent){
     postContainer.classList.toggle('post__comment--active')
 }
 
+//delete functionality
+function deletePostHandler(id){
+    const arrayAfterDeleted = posts.filter(post => post.id !== id) 
+
+    posts = arrayAfterDeleted
+
+    renderPosts(posts)
+    updateLocalStorage()
+}
+
 //show more description
 function descriptionHandler(id, element){
     const parentOfElement = element.closest('.post__description')
-    const elementOfFllDescription = posts.find(post => post.id === id)
+    const elementOfFllDescription = findElement(posts, id)
 
     parentOfElement.innerHTML = `${elementOfFllDescription.description} <button class="post__description-hide post__description--button button-reset">hide</button>`
 }
@@ -447,7 +475,7 @@ function descriptionHandler(id, element){
 function hideDescriptionHandler(element){
     const parentOfElement = element.closest('.post__description')
 
-    parentOfElement.innerHTML = `${stringValidate(parentOfElement.textContent), 35}`
+    parentOfElement.innerHTML = `${stringValidate(parentOfElement.textContent, 35)}`
 }
 
 //follow each click inside of article
@@ -456,18 +484,20 @@ function addFunctionality(e){
     const parentOfElement = event.closest('.post')
     const dataId = +event.closest('.post').dataset.post
     
-    if(event.classList.contains('post__add-like')){
+    if(event.classList.contains(POST_ADD_LIKE)){
         likesHandler(dataId, parentOfElement)
-    }else if(event.classList.contains('post__add-comment')){
+    }else if(event.classList.contains(POST_ADD_COMMENT)){
         commentHandler(parentOfElement)
-    }else if(event.classList.contains('post__comment-button')){
+    }else if(event.classList.contains(POST_COMMENT_BUTTON)){
         addCommentHandler(dataId, parentOfElement)
-    }else if(event.classList.contains('post__description-more')){
+    }else if(event.classList.contains(POST_DESCRIPTION_MORE)){
         descriptionHandler(dataId, event)
-    }else if(event.classList.contains('post__description-hide')){
+    }else if(event.classList.contains(POST_DESCRIPTION_HIDE)){
         hideDescriptionHandler(event)
-    }else if(event.classList.contains('post__all')){
+    }else if(event.classList.contains(POST_ALL)){
         showCommetsHandler(dataId)
+    }else if(event.classList.contains(POST_DELETE_IMAGE)){
+        deletePostHandler(dataId)
     }
 }
 
@@ -483,13 +513,13 @@ function renderPosts(array){
     postsContainer.innerHTML = ''
 
     if(!array.length){    
-        warningContainer.classList.add('blog__warning--active')
+        addClass(warningContainer, 'blog__warning--active')
         warningContainer.textContent = 'нічого не було знайдено'
 
         return
     }
 
-    warningContainer.classList.remove('blog__warning--active')
+    removeClass(warningContainer, 'blog__warning--active')
     const div = document.createElement('div')
     div.classList.add('blog__wrapper')
 
@@ -498,10 +528,17 @@ function renderPosts(array){
         <article class="blog__post post" data-post=${post.id}>
             <div class="post__body">
                 <div class="post__header">
-                    <div class="post__avatar">
-                        <img class="post__avatar-image" src=${post.personal.currentAvatarUrl} alt="avatar">
+                    <div class="post__wrapper">
+                        <div class="post__avatar">
+                            <img class="post__avatar-image" src=${post.personal.currentAvatarUrl} alt="avatar">
+                        </div>
+                        <h3 class="post__nickname">${post.personal.currentUsername || 'anonymus'}</h3>
                     </div>
-                    <h3 class="post__nickname">${post.personal.currentUsername || 'anonymus'}</h3>
+
+                    <div class="post__delete">
+                        <img class="post__delete-image" src="images/cross-close.png" alt="delete">
+                    </div>
+
                 </div>
                     
                 <div class="post__main">
@@ -537,7 +574,7 @@ function renderPosts(array){
                         }).join('') : ''}
                     </ul>
 
-                    ${post.comments && `<button class="post__all button-reset">всі ${post.comments.length} коменентарі<button>`}
+                    ${post.comments && `<button class="post__all button-reset">всі ${post.comments.length} коментарі<button>`}
                 </div>
             </div>
         </article>
