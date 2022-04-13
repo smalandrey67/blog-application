@@ -14,7 +14,6 @@ const previewAvatarImage = document.querySelector('.form-popup__file-preview__im
 const formFileContainer = document.querySelector('.form__add')
 const warningContainer = document.querySelector('.blog__warning')
 const cardsList = document.querySelector('.cards__list')
-const spinner = document.querySelector('.spinner')
 
 //button veribles
 const buttonAdd = document.getElementById('add-button')
@@ -73,14 +72,15 @@ const POST_DELETE_IMAGE = 'post__delete-image'
 
 
 if(!posts.length){
-    addClass(spinner, 'spinner--active')
+    addClass(warningContainer, 'blog__warning--active')
+    warningContainer.textContent = 'Поки що не має постів'
 }
 
 //getting data whenever page loads 
 if(localStorage.getItem('posts')){
     posts = JSON.parse(localStorage.getItem('posts'))
 
-    removeClass(spinner, 'spinner--active')
+    removeClass(warningContainer, 'blog__warning--active')
     
     renderPosts(posts)
 }
